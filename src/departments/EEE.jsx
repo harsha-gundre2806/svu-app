@@ -8,6 +8,7 @@ const EEE = ({ isAdmin }) => {
   const [selectedSem, setSelectedSem] = useState("Sem-1");
   const [allFiles, setAllFiles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [popup, setPopup] = useState({ open: false, type: "", files: [] });
 
   const semesters = [
     "Sem-1", "Sem-2", "Sem-3", "Sem-4",
@@ -66,18 +67,54 @@ const EEE = ({ isAdmin }) => {
   // ⚡ Fancy EEE loading animation
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-yellow-50 via-white to-yellow-100">
+      <div className="flex font-inter flex-col items-center justify-center min-h-screen bg-gradient-to-br from-yellow-50 via-white to-yellow-100">
         <div className="animate-spin rounded-full h-20 w-20 border-4 border-yellow-400 border-t-transparent"></div>
         <h1 className="text-3xl font-bold mt-4 bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 bg-clip-text text-transparent">
           Powering up EEE...
         </h1>
-        <p className="mt-2 text-gray-600">Connecting circuits, please wait ⚡</p>
+        <p className="mt-2 text-gray-600">Connecting circuits, please wait </p>
       </div>
     );
   }
 
+  const FileSection = ({ title, files, type, icon }) => (
+    <div className="mt-6 relative border border-gray-300 p-7 rounded-lg shadow-md">
+      <h3 className="text-md font-bold mb-2">{icon} {title}</h3>
+
+      {files.length === 0 ? (
+        <p className="text-gray-500">No {title.toLowerCase()} uploaded.</p>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {files.slice(0, 4).map((file) => (
+              <div
+                key={file.id}
+                className="cursor-pointer p-3 bg-gray-300 rounded-md shadow-sm hover:shadow-lg"
+                onClick={() => window.open(file.file, "_blank")}
+              >
+                <div className="flex items-center justify-center h-24 bg-white/50 rounded mb-2">
+                  <span className="text-gray-700 text-lg">{icon}</span>
+                </div>
+                <p className="text-center text-sm font-semibold truncate">{file.name}</p>
+              </div>
+            ))}
+          </div>
+
+          {files.length > 4 && (
+            <button
+              onClick={() => setPopup({ open: true, type, files })}
+              className="absolute bottom-2 right-2 text-yellow-600 hover:underline text-sm font-medium"
+            >
+              View More →
+            </button>
+          )}
+        </>
+      )}
+    </div>
+  );
+
   return (
-    <div className="p-6">
+    <div className="p-6 font-inter">
       <h1 className="text-2xl font-bold mb-4">
         Electrical and Electronics Engineering
       </h1>
@@ -109,7 +146,7 @@ const EEE = ({ isAdmin }) => {
                   : "bg-gray-200 text-gray-800 hover:bg-yellow-100"
               }`}
           >
-            {`📘 ${sem}`}
+            {`${sem}`}
           </button>
         ))}
       </div>
@@ -131,115 +168,55 @@ const EEE = ({ isAdmin }) => {
           📊 Uploaded Files Summary
         </h3>
         <ul className="text-sm text-gray-700 space-y-1 pl-3 list-disc">
-          <li>📄 PDFs: {pdfs.length}</li>
-          <li>🖼️ Images: {images.length}</li>
-          <li>📝 Text Notes: {texts.length}</li>
+          <li>PDFs: {pdfs.length}</li>
+          <li>Images: {images.length}</li>
+          <li>Text Notes: {texts.length}</li>
         </ul>
       </section>
 
-      {/* PDFs */}
-      <div className="mt-6">
-        <h3 className="text-md font-bold mb-2">📄 PDFs</h3>
-        {pdfs.length === 0 ? (
-          <p className="text-gray-500">No PDFs uploaded.</p>
-        ) : (
-          pdfs.map(file => (
-            <div
-              key={file.id}
-              className="flex justify-between items-center p-2 bg-gray-100 mb-2"
-            >
-              <span>{file.name}</span>
-              <div className="space-x-2">
-                <a
-                  href={file.file}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600"
+      {/* Sections with limited preview + popup */}
+      <FileSection title="PDFs" files={pdfs} type="pdfs" icon=<svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#000000"><path d="M331-431h37v-83h48q15.73 0 26.36-10.64Q453-535.28 453-551v-48q0-15.72-10.64-26.36Q431.73-636 416-636h-85v205Zm37-120v-48h48v48h-48Zm129 120h84q15 0 26-10.64 11-10.63 11-26.36v-131q0-15.72-11-26.36Q596-636 581-636h-84v205Zm37-37v-131h47v131h-47Zm133 37h37v-83h50v-37h-50v-48h50v-37h-87v205ZM260-200q-24 0-42-18t-18-42v-560q0-24 18-42t42-18h560q24 0 42 18t18 42v560q0 24-18 42t-42 18H260Zm0-60h560v-560H260v560ZM140-80q-24 0-42-18t-18-42v-620h60v620h620v60H140Zm120-740v560-560Z"/></svg> />
+      <FileSection title="Images" files={images} type="images" icon= <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#000000"><path d="M180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600v-600H180v600Zm56-97h489L578-473 446-302l-93-127-117 152Zm-56 97v-600 600Z"/></svg> />
+      <FileSection title="Text Notes" files={texts} type="texts" icon=<svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#000000"><path d="M320-460h320v-60H320v60Zm0 120h320v-60H320v60Zm0 120h200v-60H320v60ZM220-80q-24 0-42-18t-18-42v-680q0-24 18-42t42-18h361l219 219v521q0 24-18 42t-42 18H220Zm331-554v-186H220v680h520v-494H551ZM220-820v186-186 680-680Z"/></svg> />
+
+      {/* Popup Modal (CSE-style) */}
+      {popup.open && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setPopup({ open: false, type: "", files: [] })}
+        >
+          <div
+            className="bg-white w-[70%] max-h-[80%] overflow-y-auto rounded-lg p-6 shadow-lg relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-bold mb-4">
+              {popup.type === "pdfs" ? "All PDFs" : popup.type === "images" ? "All Images" : " All Text Notes"}
+            </h2>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {popup.files.map((file) => (
+                <div
+                  key={file.id}
+                  className="cursor-pointer p-3 bg-gray-300 rounded-md shadow-sm hover:shadow-lg"
+                  onClick={() => window.open(file.file, "_blank")}
                 >
-                  View
-                </a>
-                <a href={file.file} download className="text-green-600">
-                  Download
-                </a>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* Images */}
-      <div className="mt-6">
-        <h3 className="text-md font-bold mb-2">🖼️ Images</h3>
-        <div className="grid grid-cols-2 gap-4">
-          {images.length === 0 ? (
-            <p className="text-gray-500">No images uploaded.</p>
-          ) : (
-            images.map(img => (
-              <div key={img.id} className="p-2 bg-gray-100 rounded">
-                <img
-                  src={img.file}
-                  alt={img.name}
-                  className="w-full h-auto mb-2"
-                />
-                <div className="flex justify-between">
-                  <a
-                    href={img.file}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600"
-                  >
-                    View
-                  </a>
-                  <a href={img.file} download className="text-green-600">
-                    Download
-                  </a>
+                  <div className="flex items-center justify-center h-24 bg-white/50 rounded mb-2">
+                    <span className="text-gray-700 text-lg">
+                      {popup.type === "pdfs" ? <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#000000"><path d="M331-431h37v-83h48q15.73 0 26.36-10.64Q453-535.28 453-551v-48q0-15.72-10.64-26.36Q431.73-636 416-636h-85v205Zm37-120v-48h48v48h-48Zm129 120h84q15 0 26-10.64 11-10.63 11-26.36v-131q0-15.72-11-26.36Q596-636 581-636h-84v205Zm37-37v-131h47v131h-47Zm133 37h37v-83h50v-37h-50v-48h50v-37h-87v205ZM260-200q-24 0-42-18t-18-42v-560q0-24 18-42t42-18h560q24 0 42 18t18 42v560q0 24-18 42t-42 18H260Zm0-60h560v-560H260v560ZM140-80q-24 0-42-18t-18-42v-620h60v620h620v60H140Zm120-740v560-560Z"/></svg> : popup.type === "images" ? <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#000000"><path d="M180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600v-600H180v600Zm56-97h489L578-473 446-302l-93-127-117 152Zm-56 97v-600 600Z"/></svg> : <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#000000"><path d="M320-460h320v-60H320v60Zm0 120h320v-60H320v60Zm0 120h200v-60H320v60ZM220-80q-24 0-42-18t-18-42v-680q0-24 18-42t42-18h361l219 219v521q0 24-18 42t-42 18H220Zm331-554v-186H220v680h520v-494H551ZM220-820v186-186 680-680Z"/></svg>}
+                    </span>
+                  </div>
+                  <p className="text-center text-sm font-semibold truncate">{file.name}</p>
                 </div>
-              </div>
-            ))
-          )}
+              ))}
+            </div>
+            <button
+              onClick={() => setPopup({ open: false, type: "", files: [] })}
+              className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-lg font-bold"
+            >
+              ✖
+            </button>
+          </div>
         </div>
-      </div>
-
-      {/* Text Notes */}
-     {/* Text Notes */}
-<div className="mt-6">
-  <h3 className="text-md font-bold mb-2">📝 Text Notes</h3>
-  {texts.length === 0 ? (
-    <p className="text-gray-500">No text notes uploaded.</p>
-  ) : (
-    texts.map(txt => (
-      <div key={txt.id} className="p-3 bg-yellow-50 mb-2 rounded">
-        <h4 className="font-semibold mb-1">{txt.name}</h4>
-        <iframe
-          src={txt.file}
-          title={txt.name}
-          className="w-full h-40 border rounded"
-        />
-        {/* ✅ Action buttons for Open + Download */}
-        <div className="flex justify-end gap-4 text-sm mt-2">
-          <a
-            href={txt.file}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:underline"
-          >
-            Open
-          </a>
-          <a
-            href={txt.file}
-            download
-            className="text-green-600 hover:underline"
-          >
-            Download
-          </a>
-        </div>
-      </div>
-    ))
-  )}
-</div>
-
-
-      
+      )}
     </div>
   );
 };

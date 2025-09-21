@@ -68,7 +68,7 @@ const FeedbackForm = () => {
         </div>
 
         <h2 className="text-2xl font-bold text-center mb-4 text-blue-700">
-          📨 Submit Your Feedback
+          📋 Submit Your Feedback
         </h2>
 
         <div className="mb-4">

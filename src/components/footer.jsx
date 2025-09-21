@@ -16,7 +16,7 @@ const Footer = ({ isAdmin }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <FaUniversity className="text-blue-400" /> Overview
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z"/></svg> Overview
           </motion.h3>
           <ul className="space-y-2 text-sm text-gray-300">
             <li><Link to="/home" className="hover:underline" onClick={() => window.scrollTo(0, 0)}>Home</Link></li>
@@ -34,7 +34,7 @@ const Footer = ({ isAdmin }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <FaCodeBranch className="text-green-400" /> Departments
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M200-280v-280h80v280h-80Zm240 0v-280h80v280h-80ZM80-120v-80h800v80H80Zm600-160v-280h80v280h-80ZM80-640v-80l400-200 400 200v80H80Zm178-80h444-444Zm0 0h444L480-830 258-720Z"/></svg> Departments
           </motion.h3>
           <ul className="space-y-2 text-sm text-gray-300">
             <li><Link to="/cse" className="hover:underline" onClick={() => window.scrollTo(0, 0)}>Computer Science</Link></li>
@@ -54,7 +54,7 @@ const Footer = ({ isAdmin }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
           >
-            <FaUpload className="text-yellow-400" /> Student Upload
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M440-320v-326L336-542l-56-58 200-200 200 200-56 58-104-104v326h-80ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/></svg> Student Upload
           </motion.h3>
           <ul className="space-y-2 text-sm text-gray-300">
             <li><Link to="/student-upload" className="hover:underline" onClick={() => window.scrollTo(0, 0)}>StudentUpload</Link></li>
@@ -66,7 +66,7 @@ const Footer = ({ isAdmin }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <FaQuestionCircle className="text-red-400" /> Help
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M478-240q21 0 35.5-14.5T528-290q0-21-14.5-35.5T478-340q-21 0-35.5 14.5T428-290q0 21 14.5 35.5T478-240Zm-36-154h74q0-33 7.5-52t42.5-52q26-26 41-49.5t15-56.5q0-56-41-86t-97-30q-57 0-92.5 30T342-618l66 26q5-18 22.5-39t53.5-21q32 0 48 17.5t16 38.5q0 20-12 37.5T506-526q-44 39-54 59t-10 73Zm38 314q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg> Help
           </motion.h3>
           <ul className="space-y-2 text-sm text-gray-300">
             <li><Link to="/help" className="hover:underline" onClick={() => window.scrollTo(0, 0)}>Help</Link></li> 
@@ -82,7 +82,7 @@ const Footer = ({ isAdmin }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9 }}
           >
-            <FaEnvelope className="text-purple-400" /> Contact Us
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200ZM160-640v-80 480-400Z"/></svg> Contact Us
           </motion.h3>
           <ul className="space-y-2 text-sm text-gray-300">
             <li>

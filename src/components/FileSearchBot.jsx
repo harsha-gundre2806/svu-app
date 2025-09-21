@@ -10,7 +10,6 @@ const FileSearchBot = ({ uploads }) => {
     setQuery("");
     setResults([]);
   };
-
   const handleSearch = () => {
     const lowerQuery = query.trim().toLowerCase();
     if (!lowerQuery) {
@@ -84,7 +83,7 @@ const FileSearchBot = ({ uploads }) => {
                     <p className="text-xs text-gray-500 mb-1">
                       Branch: {file.branch} | Semester: {file.semester}
                       <br />
-                      Uploaded: {new Date(file.timestamp).toLocaleString()}
+                      
                     </p>
 
                     {/* File Preview */}
@@ -119,13 +118,6 @@ const FileSearchBot = ({ uploads }) => {
                         className="text-blue-600 hover:underline"
                       >
                         Open
-                      </a>
-                      <a
-                        href={file.url}
-                        download
-                        className="text-green-600 hover:underline"
-                      >
-                        Download
                       </a>
                     </div>
                   </div>

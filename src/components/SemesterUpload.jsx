@@ -6,19 +6,18 @@ const BACKEND_URL =
 const SemesterUpload = ({ branch, semester, isAdmin, uploads = [], refreshFiles }) => {
   const [textNote, setTextNote] = useState("");
   const [popup, setPopup] = useState(null);
-  const [loading, setLoading] = useState(false); // ✅ loading state
+  const [loading, setLoading] = useState(false);
+  const [modalFiles, setModalFiles] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const showPopup = (message) => {
     setPopup(message);
-    setLoading(false); // stop loader when done
+    setLoading(false);
   };
-
-  const closePopup = () => {
-    setPopup(null);
-  };
+  const closePopup = () => setPopup(null);
 
   const uploadToGoogleDrive = async (file) => {
-    setLoading(true); // ✅ start loading
+    setLoading(true);
     const reader = new FileReader();
     reader.onload = async () => {
       try {
@@ -39,7 +38,7 @@ const SemesterUpload = ({ branch, semester, isAdmin, uploads = [], refreshFiles 
 
         if (typeof refreshFiles === "function") refreshFiles();
         showPopup(`✅ ${file.name} uploaded successfully!`);
-      } catch (err) {
+      } catch {
         showPopup("❌ Upload failed. Try again.");
       }
     };
@@ -53,8 +52,8 @@ const SemesterUpload = ({ branch, semester, isAdmin, uploads = [], refreshFiles 
   };
 
   const handleTextSubmit = async () => {
-    if (textNote.trim() === "") return;
-    setLoading(true); // ✅ start loading
+    if (!textNote.trim()) return;
+    setLoading(true);
 
     try {
       const filename = `${branch}--${semester}--Note_${Date.now()}.txt`;
@@ -80,7 +79,6 @@ const SemesterUpload = ({ branch, semester, isAdmin, uploads = [], refreshFiles 
     }
   };
 
-  // delete + rename unchanged
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this file?")) return;
     setLoading(true);
@@ -120,37 +118,71 @@ const SemesterUpload = ({ branch, semester, isAdmin, uploads = [], refreshFiles 
   const images = filtered.filter(f => f.type.startsWith("image/"));
   const texts = filtered.filter(f => f.type === "text/plain");
 
-  return (
-    <div className="relative p-3 sm:p-6 bg-white rounded shadow mt-6 max-w-4xl mx-auto">
+  const openModal = (files) => {
+    setModalFiles(files);
+    setIsModalOpen(true);
+  };
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalFiles([]);
+  };
 
-      {/* ✅ Loader Overlay */}
+  const renderFileGrid = (files, type) => {
+    const icon = type === "pdfs" ? "📄" : type === "images" ? "🖼️" : "📝";
+    return (
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        {files.slice(0, 4).map(file => (
+          <div
+            key={file.id}
+            className="p-3 bg-gray-100 rounded shadow hover:shadow-lg cursor-pointer"
+          >
+            <div className="flex items-center justify-center h-24 bg-white rounded mb-2">
+              <span className="text-2xl">{icon}</span>
+            </div>
+            <p className="text-sm font-semibold truncate">{file.name}</p>
+            <div className="flex justify-between mt-2 text-sm">
+              <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-600">View</a>
+              
+              {isAdmin && (
+                <>
+                  <button onClick={() => handleDelete(file.id)} className="text-red-600">Del</button>
+                  <button onClick={() => handleRename(file.id, file.name)} className="text-yellow-600">Rename</button>
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+        {files.length > 4 && (
+          <div className="col-span-full text-right">
+            <button onClick={() => openModal(files)} className="text-blue-600 hover:underline text-sm">
+              View More →
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="relative p-4 sm:p-6 bg-white rounded shadow mt-6 max-w-4xl mx-auto">
       {loading && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
         </div>
       )}
-
-      {/* ✅ Popup */}
       {popup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
             <p className="text-lg font-semibold mb-4">{popup}</p>
-            <button
-              onClick={closePopup}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              OK
-            </button>
+            <button onClick={closePopup} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">OK</button>
           </div>
         </div>
       )}
 
-      <h2 className="text-base sm:text-xl font-bold mb-4 text-center">
-        {branch} - {semester} {isAdmin ? "Upload Panel" : "Materials"}
-      </h2>
+      <h2 className="text-xl font-bold mb-4 text-center">{branch} - {semester} {isAdmin ? "Upload Panel" : "Materials"}</h2>
 
       {isAdmin && (
-        <div className="space-y-4">
+        <div className="space-y-4 mb-6">
           <div>
             <label className="font-semibold">Upload PDF:</label>
             <input type="file" accept="application/pdf" onChange={handleFileUpload} className="block mt-1" />
@@ -160,89 +192,69 @@ const SemesterUpload = ({ branch, semester, isAdmin, uploads = [], refreshFiles 
             <input type="file" accept="image/*" onChange={handleFileUpload} className="block mt-1" />
           </div>
           <div>
-            <label className="font-semibold">Enter Text Note:</label>
+            <label className="font-semibold">Text Note:</label>
             <textarea
               value={textNote}
               onChange={(e) => setTextNote(e.target.value)}
               rows={4}
               className="w-full p-2 border border-gray-300 rounded mt-1"
             />
-            <button
-              className="mt-2 px-4 py-1 bg-blue-600 text-white rounded"
-              onClick={handleTextSubmit}
-            >
-              Submit
-            </button>
+            <button className="mt-2 px-4 py-1 bg-blue-600 text-white rounded" onClick={handleTextSubmit}>Submit</button>
           </div>
         </div>
       )}
 
-      {/* PDFs */}
-      <div className="mt-8">
-        <h3 className="text-sm sm:text-lg font-bold mb-2">📄 PDFs</h3>
-        {pdfs.length === 0 ? (
-          <p className="text-gray-500 text-sm">No PDFs uploaded.</p>
-        ) : pdfs.map(file => (
-          <div key={file.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-2 bg-gray-100 mb-2 rounded">
-            <span className="text-sm">{file.name}</span>
-            <div className="flex flex-wrap gap-2 mt-2 sm:mt-0 text-sm">
-              <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-600">View</a>
-              <a href={file.url} download className="text-green-600">Download</a>
-              {isAdmin && (
-                <>
-                  <button onClick={() => handleDelete(file.id)} className="text-red-600">Delete</button>
-                  <button onClick={() => handleRename(file.id, file.name)} className="text-yellow-600">Rename</button>
-                </>
-              )}
+      {/* Render Grids */}
+      <div className="mb-6">
+        <h3 className="text-lg font-bold mb-2">📄 PDFs</h3>
+        {pdfs.length === 0 ? <p className="text-gray-500">No PDFs uploaded.</p> : renderFileGrid(pdfs, "pdfs")}
+      </div>
+      <div className="mb-6">
+        <h3 className="text-lg font-bold mb-2">🖼️ Images</h3>
+        {images.length === 0 ? <p className="text-gray-500">No images uploaded.</p> : renderFileGrid(images, "images")}
+      </div>
+      <div className="mb-6">
+        <h3 className="text-lg font-bold mb-2">📝 Text Notes</h3>
+        {texts.length === 0 ? <p className="text-gray-500">No text notes uploaded.</p> : renderFileGrid(texts, "texts")}
+      </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50" onClick={closeModal}>
+          <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-3/4 lg:w-2/3 max-h-[80vh] overflow-y-auto relative" onClick={(e) => e.stopPropagation()}>
+            <span className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-2xl font-bold cursor-pointer" onClick={closeModal}>✖</span>
+            <h2 className="text-lg font-bold mb-4">All Files</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {modalFiles.map(file => {
+                let icon = "📂";
+                if (file.type.includes("pdf")) icon = "📄";
+                else if (file.type.startsWith("image/")) icon = "🖼️";
+                else if (file.type === "text/plain") icon = "📝";
+
+                return (
+                  <div key={file.id} className="p-3 bg-gray-100 rounded shadow hover:shadow-lg cursor-pointer">
+                    <div className="flex items-center justify-center h-24 bg-white rounded mb-2">
+                      <span className="text-2xl">{icon}</span>
+                    </div>
+                    <p className="text-sm font-semibold truncate">{file.name}</p>
+                    <div className="flex justify-between mt-2 text-sm">
+                      <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-600">View</a>
+          
+                      {isAdmin && (
+                        <>
+                          <button onClick={() => handleDelete(file.id)} className="text-red-600">Del</button>
+                          <button onClick={() => handleRename(file.id, file.name)} className="text-yellow-600">Rename</button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
 
-      {/* Images */}
-      <div className="mt-8">
-        <h3 className="text-sm sm:text-lg font-bold mb-2">🖼️ Images</h3>
-        {images.length === 0 ? (
-          <p className="text-gray-500 text-sm">No images uploaded.</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {images.map(img => (
-              <div key={img.id} className="p-2 bg-gray-100 rounded shadow">
-                <img src={img.url} alt={img.name} className="w-full h-auto mb-2 rounded" />
-                <div className="flex justify-between text-sm">
-                  <a href={img.url} target="_blank" rel="noopener noreferrer" className="text-blue-600">View</a>
-                  <a href={img.url} download className="text-green-600">Download</a>
-                  {isAdmin && (
-                    <>
-                      <button onClick={() => handleDelete(img.id)} className="text-red-600">Delete</button>
-                      <button onClick={() => handleRename(img.id, img.name)} className="text-yellow-600">Rename</button>
-                    </>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Text Notes */}
-      <div className="mt-8">
-        <h3 className="text-sm sm:text-lg font-bold mb-2">📝 Text Notes</h3>
-        {texts.length === 0 ? (
-          <p className="text-gray-500 text-sm">No text notes uploaded.</p>
-        ) : texts.map(txt => (
-          <div key={txt.id} className="p-3 bg-gray-100 mb-4 rounded">
-            <h4 className="font-semibold text-sm mb-1">{txt.name}</h4>
-            <iframe src={txt.url} title={txt.name} className="w-full h-40 border rounded" />
-            {isAdmin && (
-              <div className="flex gap-3 mt-2">
-                <button onClick={() => handleDelete(txt.id)} className="text-red-600 text-sm">Delete</button>
-                <button onClick={() => handleRename(txt.id, txt.name)} className="text-yellow-600 text-sm">Rename</button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
     </div>
   );
 };

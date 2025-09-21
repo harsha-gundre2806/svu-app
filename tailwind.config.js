@@ -8,6 +8,9 @@ module.exports = {
       animation: {
         'gradient-x': 'gradient-x 3s ease infinite',
       },
+      fontFamily: {
+        inter: ["Inter", "sans-serif"],
+      },
       keyframes: {
         'gradient-x': {
           '0%, 100%': { 'background-position': '0% 50%' },

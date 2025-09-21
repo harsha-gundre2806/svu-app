@@ -11,6 +11,8 @@ import FileSearchBot from './components/FileSearchBot';
 import FeedbackForm from './components/feedback';
 import Card1 from './components/Card1';
 import Card2 from './components/Card2';
+import ImageGalleryUpload from './components/ImageGalleryUpload';
+import ImageGallery from './components/ImageGallery';
 
 // Lazy-loaded components
 const CSE = lazy(() => import('./departments/CSE'));
@@ -24,9 +26,16 @@ const Announcements = lazy(() => import('./components/Announcements'));
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 const AnnouncementUpload = lazy(() => import('./components/AnnouncementUpload'));
 
+
 const BACKEND_URL =
   "https://script.google.com/macros/s/AKfycbxh9GsREmsAdUhDkUYTw6klDhg0eXhVPd94H4o8eGwsqMVEZ3yN2FWlhbndKNsrq30eFg/exec";
+function ScrollToTopOnMount({ children }) {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
+  return children;
+}
 function App() {
   const [uploads, setUploads] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -132,8 +141,59 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/about-svu" element={<AboutSVU />} />
           <Route path="/help" element={<Help />} />
-          <Route path="/card1" element={<Card1 />} />
-          <Route path="/card2" element={<Card2 />} />
+          <Route
+  path="/card1"
+  element={
+    <ScrollToTopOnMount>
+      <Card1 />
+    </ScrollToTopOnMount>
+  }
+/>
+
+<Route
+  path="/card2"
+  element={
+    <ScrollToTopOnMount>
+      <Card2 />
+    </ScrollToTopOnMount>
+  }
+/>
+
+          
+  <Route
+  path="/gallery"
+  element={
+    <Suspense fallback={<div className="p-6 text-center">Loading gallery...</div>}>
+      <div className="max-w-6xl mx-auto p-4">
+        {/* Gallery display only */}
+        <ImageGallery files={uploads} />
+      </div>
+    </Suspense>
+  }
+/>
+
+<Route
+  path="/img-upload"
+  element={
+    <Suspense fallback={<div className="p-6 text-center">Loading upload panel...</div>}>
+      <div className="max-w-3xl mx-auto p-4">
+        <h2 className="text-2xl font-bold mb-4 text-center">Image & Video Upload</h2>
+
+        {/* Upload panel */}
+        <ImageGalleryUpload refreshGallery={fetchUploads} />
+
+        <hr className="my-6 border-gray-300" />
+
+        {/* Gallery below the upload panel */}
+        <h3 className="text-xl font-semibold mb-4 text-center">Uploaded Files</h3>
+        <ImageGallery files={uploads} />
+      </div>
+    </Suspense>
+  }
+/>
+
+
+
 
           <Route
             path="/recent"
@@ -148,13 +208,18 @@ function App() {
           <Route path="/student-upload" element={<StudentUpload />} />
 
           <Route
-            path="/announcements"
-            element={
-              <Suspense fallback={<div className="p-6 text-center">Loading announcements...</div>}>
-                <Announcements isAdmin={isAdmin} />
-              </Suspense>
-            }
-          />
+  path="/announcements"
+  element={
+    <Suspense
+      fallback={<div className="p-6 text-center">Loading announcements...</div>}
+    >
+      <ScrollToTopOnMount>
+        <Announcements isAdmin={isAdmin} />
+      </ScrollToTopOnMount>
+    </Suspense>
+  }
+/>
+
 
           <Route path="/feedback" element={<FeedbackForm />} />
 

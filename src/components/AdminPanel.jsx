@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SemesterUpload from './SemesterUpload';
+
+const BACKEND_URL =
+  "https://script.google.com/macros/s/AKfycbxh9GsREmsAdUhDkUYTw6klDhg0eXhVPd94H4o8eGwsqMVEZ3yN2FWlhbndKNsrq30eFg/exec";
 
 const AdminPanel = ({ uploads, setUploads }) => {
   const [view, setView] = useState('departments');
@@ -7,20 +10,31 @@ const AdminPanel = ({ uploads, setUploads }) => {
   const semesters = ['Sem-1', 'Sem-2', 'Sem-3', 'Sem-4', 'Sem-5', 'Sem-6', 'Sem-7', 'Sem-8'];
   const [selectedBranch, setSelectedBranch] = useState('');
   const [selectedSem, setSelectedSem] = useState('');
+  const [loadingUploads, setLoadingUploads] = useState(false);
 
-  const refreshUploads = () => {
-    fetch("https://script.google.com/macros/s/AKfycbxh9GsREmsAdUhDkUYTw6klDhg0eXhVPd94H4o8eGwsqMVEZ3yN2FWlhbndKNsrq30eFg/exec")
-      .then(res => res.json())
-      .then(data => setUploads(data))
-      .catch(err => console.error("Fetch error:", err));
+  const refreshUploads = async () => {
+    setLoadingUploads(true);
+    try {
+      const res = await fetch(BACKEND_URL);
+      const data = await res.json();
+      setUploads(data);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    } finally {
+      setLoadingUploads(false);
+    }
   };
+
+  useEffect(() => {
+    refreshUploads();
+  }, []);
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h2 className="text-3xl font-bold mb-6 text-center text-blue-800">Admin Panel</h2>
 
       {/* Toggle Buttons */}
-      <div className="flex justify-center gap-4 mb-8">
+      <div className="flex flex-wrap justify-center gap-4 mb-8">
         <button
           className={`px-6 py-2 rounded-full shadow-lg font-semibold transition-transform transform hover:scale-105 ${
             view === 'departments' ? 'bg-blue-700 text-white' : 'bg-blue-300 text-blue-900'
@@ -43,10 +57,16 @@ const AdminPanel = ({ uploads, setUploads }) => {
         </button>
       </div>
 
+      {loadingUploads && (
+        <div className="flex justify-center mb-6">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500"></div>
+        </div>
+      )}
+
       {/* Departments View */}
       {view === 'departments' && (
         <>
-          <h3 className="text-xl font-semibold mb-3 text-gray-800">Select Branch</h3>
+          <h3 className="text-xl font-semibold mb-3 text-gray-800 text-center">Select Branch</h3>
           <div className="flex flex-wrap gap-3 justify-center mb-6">
             {branches.map(branch => (
               <button

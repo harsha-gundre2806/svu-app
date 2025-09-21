@@ -9,6 +9,9 @@ const CSE = ({ isAdmin }) => {
   const [allFiles, setAllFiles] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Popup state
+  const [popupType, setPopupType] = useState(null); // "pdfs" | "images" | "texts" | null
+
   const semesters = [
     "Sem-1", "Sem-2", "Sem-3", "Sem-4",
     "Sem-5", "Sem-6", "Sem-7", "Sem-8"
@@ -63,74 +66,87 @@ const CSE = ({ isAdmin }) => {
   const images = filtered.filter(f => f.type === "images");
   const texts = filtered.filter(f => f.type === "texts");
 
-  // 💻 CSE-themed loading screen
- if (loading) {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-green-400 font-mono relative overflow-hidden">
-      
-      {/* Binary Background */}
-      <div className="absolute inset-0 opacity-20">
-        {Array.from({ length: 50 }).map((_, i) => (
-          <p
-            key={i}
-            className="absolute animate-fall"
-            style={{
-              left: `${Math.random() * 100}%`,
-              animationDuration: `${5 + Math.random() * 5}s`,
-              animationDelay: `${Math.random() * 5}s`,
-              fontSize: `${12 + Math.random() * 8}px`,
-            }}
-          >
-            {Array.from({ length: 30 })
-              .map(() => (Math.random() > 0.5 ? "0" : "1"))
-              .join("")}
-          </p>
-        ))}
+  // Helper for rendering files
+  const renderFileCard = (file, icon) => (
+    <div
+      key={file.id}
+      className="cursor-pointer p-3 bg-gray-300 rounded-md shadow-sm hover:shadow-lg"
+      onClick={() => window.open(file.file, "_blank")}
+    >
+      <div className="flex items-center justify-center h-24 bg-white/50 rounded mb-2">
+        <span className="text-gray-700 text-lg">{icon}</span>
       </div>
-
-      {/* Boot Text */}
-      <div className="z-10 text-center">
-        <p className="text-2xl mb-2 text-green-500 animate-pulse">
-          Initializing CSE Core...
-        </p>
-        <p className="text-sm opacity-70">
-          Running diagnostics, decrypting resources...
-        </p>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="w-64 h-3 bg-gray-800 rounded-full mt-6 overflow-hidden z-10">
-        <div className="h-full bg-green-500 animate-progress" />
-      </div>
-
-      <style>
-        {`
-          @keyframes fall {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100vh); }
-          }
-          .animate-fall {
-            animation-name: fall;
-            animation-timing-function: linear;
-            animation-iteration-count: infinite;
-          }
-          @keyframes progress {
-            0% { width: 0%; }
-            50% { width: 80%; }
-            100% { width: 100%; }
-          }
-          .animate-progress {
-            animation: progress 3s ease-in-out infinite;
-          }
-        `}
-      </style>
+      <p className="text-center text-sm font-semibold truncate">{file.name}</p>
     </div>
   );
-}
 
+  // Popup files
+  const popupFiles =
+    popupType === "pdfs" ? pdfs : popupType === "images" ? images : popupType === "texts" ? texts : [];
+
+  // Loading animation
+  if (loading) {
+    return (
+      <div className="flex font-inter flex-col items-center justify-center min-h-screen bg-black text-green-400 font-mono relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          {Array.from({ length: 50 }).map((_, i) => (
+            <p
+              key={i}
+              className="absolute animate-fall"
+              style={{
+                left: `${Math.random() * 100}%`,
+                animationDuration: `${5 + Math.random() * 5}s`,
+                animationDelay: `${Math.random() * 5}s`,
+                fontSize: `${12 + Math.random() * 8}px`,
+              }}
+            >
+              {Array.from({ length: 30 })
+                .map(() => (Math.random() > 0.5 ? "0" : "1"))
+                .join("")}
+            </p>
+          ))}
+        </div>
+
+        <div className="z-10 text-center">
+          <p className="text-2xl mb-2 text-green-500 animate-pulse">
+            Initializing CSE Core...
+          </p>
+          <p className="text-sm opacity-70">
+            Running diagnostics, decrypting resources...
+          </p>
+        </div>
+
+        <div className="w-64 h-3 bg-gray-800 rounded-full mt-6 overflow-hidden z-10">
+          <div className="h-full bg-green-500 animate-progress" />
+        </div>
+
+        <style>
+          {`
+            @keyframes fall {
+              0% { transform: translateY(-100%); }
+              100% { transform: translateY(100vh); }
+            }
+            .animate-fall {
+              animation-name: fall;
+              animation-timing-function: linear;
+              animation-iteration-count: infinite;
+            }
+            @keyframes progress {
+              0% { width: 0%; }
+              50% { width: 80%; }
+              100% { width: 100%; }
+            }
+            .animate-progress {
+              animation: progress 3s ease-in-out infinite;
+            }
+          `}
+        </style>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6">
+    <div className="p-6 font-inter">
       <h1 className="text-2xl font-bold mb-4">Computer Science & Engineering</h1>
       <img
         src="cse.jpg"
@@ -146,150 +162,140 @@ const CSE = ({ isAdmin }) => {
         </p>
       </div>
 
-      {/* Semester Buttons */}
       <div className="mb-8 flex flex-wrap justify-center gap-3">
         {semesters.map(sem => (
           <button
             key={sem}
             onClick={() => setSelectedSem(sem)}
             className={`px-5 py-2 rounded-full shadow transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg
-              ${
-                selectedSem === sem
-                  ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                  : "bg-gray-200 text-gray-800 hover:bg-gray-100"
+              ${selectedSem === sem
+                ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
               }`}
           >
-            {`📘 ${sem}`}
+            {` ${sem}`}
           </button>
         ))}
       </div>
 
-      <p className="text-sm text-gray-700">
-        Need help opening a file? Visit{" "}
-        <a
-          href="/help"
-          className="text-indigo-600 font-semibold hover:underline"
-        >
-          Help
-        </a>{" "}
-        page for guidance.
-      </p>
-
-      {/* File Summary */}
       <section className="mb-6 p-4 bg-indigo-50 shadow-md rounded-lg border border-indigo-200">
         <h3 className="text-lg font-medium mb-2 text-indigo-800">
           📊 Uploaded Files Summary
         </h3>
         <ul className="text-sm text-indigo-700 space-y-1 pl-3 list-disc">
-          <li>📄 PDFs: {pdfs.length}</li>
-          <li>🖼️ Images: {images.length}</li>
-          <li>📝 Text Notes: {texts.length}</li>
+          <li> PDFs: {pdfs.length}</li>
+          <li> Images: {images.length}</li>
+          <li> Text Notes: {texts.length}</li>
         </ul>
       </section>
 
       {/* PDFs */}
-      <div className="mt-6">
-        <h3 className="text-md font-bold mb-2">📄 PDFs</h3>
+      <div className="mt-6 border rounded-md p-4 shadow">
+        <h3 className="text-md font-bold mb-2"> PDFs</h3>
         {pdfs.length === 0 ? (
           <p className="text-gray-500">No PDFs uploaded.</p>
         ) : (
-          pdfs.map(file => (
-            <div
-              key={file.id}
-              className="flex justify-between items-center p-2 bg-gray-50 mb-2"
-            >
-              <span>{file.name}</span>
-              <div className="space-x-2">
-                <a
-                  href={file.file}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600"
-                >
-                  View
-                </a>
-                <a href={file.file} download className="text-green-600">
-                  Download
-                </a>
-              </div>
+          <>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {pdfs.slice(0, 4).map((f) => renderFileCard(f, <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#000000"><path d="M331-431h37v-83h48q15.73 0 26.36-10.64Q453-535.28 453-551v-48q0-15.72-10.64-26.36Q431.73-636 416-636h-85v205Zm37-120v-48h48v48h-48Zm129 120h84q15 0 26-10.64 11-10.63 11-26.36v-131q0-15.72-11-26.36Q596-636 581-636h-84v205Zm37-37v-131h47v131h-47Zm133 37h37v-83h50v-37h-50v-48h50v-37h-87v205ZM260-200q-24 0-42-18t-18-42v-560q0-24 18-42t42-18h560q24 0 42 18t18 42v560q0 24-18 42t-42 18H260Zm0-60h560v-560H260v560ZM140-80q-24 0-42-18t-18-42v-620h60v620h620v60H140Zm120-740v560-560Z"/></svg>))}
             </div>
-          ))
+            {pdfs.length > 4 && (
+              <div className="flex justify-end mt-3">
+                <button
+                  onClick={() => setPopupType("pdfs")}
+                  className="text-sm text-indigo-600 font-semibold hover:underline"
+                >
+                  View More →
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 
       {/* Images */}
-      <div className="mt-6">
-        <h3 className="text-md font-bold mb-2">🖼️ Images</h3>
-        <div className="grid grid-cols-2 gap-4">
-          {images.length === 0 ? (
-            <p className="text-gray-500">No images uploaded.</p>
-          ) : (
-            images.map(img => (
-              <div key={img.id} className="p-2 bg-gray-50 rounded">
-                <img
-                  src={img.file}
-                  alt={img.name}
-                  className="w-full h-auto mb-2"
-                />
-                <div className="flex justify-between">
-                  <a
-                    href={img.file}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600"
-                  >
-                    View
-                  </a>
-                  <a href={img.file} download className="text-green-600">
-                    Download
-                  </a>
-                </div>
+      <div className="mt-6 border rounded-md p-4 shadow">
+        <h3 className="text-md font-bold mb-2"> Images</h3>
+        {images.length === 0 ? (
+          <p className="text-gray-500">No images uploaded.</p>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {images.slice(0, 4).map((f) => renderFileCard(f, <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#000000"><path d="M180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600v-600H180v600Zm56-97h489L578-473 446-302l-93-127-117 152Zm-56 97v-600 600Z"/></svg>))}
+            </div>
+            {images.length > 4 && (
+              <div className="flex justify-end mt-3">
+                <button
+                  onClick={() => setPopupType("images")}
+                  className="text-sm text-indigo-600 font-semibold hover:underline"
+                >
+                  View More →
+                </button>
               </div>
-            ))
-          )}
-        </div>
+            )}
+          </>
+        )}
       </div>
 
       {/* Text Notes */}
-     {/* Text Notes */}
-<div className="mt-6">
-  <h3 className="text-md font-bold mb-2">📝 Text Notes</h3>
-  {texts.length === 0 ? (
-    <p className="text-gray-500">No text notes uploaded.</p>
-  ) : (
-    texts.map(txt => (
-      <div key={txt.id} className="p-3 bg-yellow-50 mb-2 rounded">
-        <h4 className="font-semibold mb-1">{txt.name}</h4>
-        <iframe
-          src={txt.file}
-          title={txt.name}
-          className="w-full h-40 border rounded"
-        />
-        {/* ✅ Action buttons for Open + Download */}
-        <div className="flex justify-end gap-4 text-sm mt-2">
-          <a
-            href={txt.file}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:underline"
-          >
-            Open
-          </a>
-          <a
-            href={txt.file}
-            download
-            className="text-green-600 hover:underline"
-          >
-            Download
-          </a>
-        </div>
+      <div className="mt-6 border rounded-md p-4 shadow">
+        <h3 className="text-md font-bold mb-2"> Text Notes</h3>
+        {texts.length === 0 ? (
+          <p className="text-gray-500">No text notes uploaded.</p>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {texts.slice(0, 4).map((f) => renderFileCard(f, <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#000000"><path d="M320-460h320v-60H320v60Zm0 120h320v-60H320v60Zm0 120h200v-60H320v60ZM220-80q-24 0-42-18t-18-42v-680q0-24 18-42t42-18h361l219 219v521q0 24-18 42t-42 18H220Zm331-554v-186H220v680h520v-494H551ZM220-820v186-186 680-680Z"/></svg>))}
+            </div>
+            {texts.length > 4 && (
+              <div className="flex justify-end mt-3">
+                <button
+                  onClick={() => setPopupType("texts")}
+                  className="text-sm text-indigo-600 font-semibold hover:underline"
+                >
+                  View More →
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
-    ))
-  )}
-</div>
 
-
-     
+      {/* Popup (Shared for PDFs, Images, Texts) */}
+      {popupType && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black/60 z-50"
+          onClick={() => setPopupType(null)}
+        >
+          <div
+            className="bg-white w-11/12 md:w-3/4 lg:w-2/3 xl:w-1/2 max-h-[80vh] rounded-lg shadow-lg p-6 overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">
+                {popupType === "pdfs" && "All PDFs"}
+                {popupType === "images" && "All Images"}
+                {popupType === "texts" && "All Text Notes"}
+              </h2>
+              <button
+                onClick={() => setPopupType(null)}
+                className="text-gray-600 hover:text-red-500 text-lg"
+              >
+                ✖
+              </button>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {popupFiles.map((f) =>
+                popupType === "pdfs"
+                  ? renderFileCard(f, <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#000000"><path d="M331-431h37v-83h48q15.73 0 26.36-10.64Q453-535.28 453-551v-48q0-15.72-10.64-26.36Q431.73-636 416-636h-85v205Zm37-120v-48h48v48h-48Zm129 120h84q15 0 26-10.64 11-10.63 11-26.36v-131q0-15.72-11-26.36Q596-636 581-636h-84v205Zm37-37v-131h47v131h-47Zm133 37h37v-83h50v-37h-50v-48h50v-37h-87v205ZM260-200q-24 0-42-18t-18-42v-560q0-24 18-42t42-18h560q24 0 42 18t18 42v560q0 24-18 42t-42 18H260Zm0-60h560v-560H260v560ZM140-80q-24 0-42-18t-18-42v-620h60v620h620v60H140Zm120-740v560-560Z"/></svg>)
+                  : popupType === "images"
+                  ? renderFileCard(f, <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#000000"><path d="M180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600v-600H180v600Zm56-97h489L578-473 446-302l-93-127-117 152Zm-56 97v-600 600Z"/></svg>)
+                  : renderFileCard(f, <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#000000"><path d="M320-460h320v-60H320v60Zm0 120h320v-60H320v60Zm0 120h200v-60H320v60ZM220-80q-24 0-42-18t-18-42v-680q0-24 18-42t42-18h361l219 219v521q0 24-18 42t-42 18H220Zm331-554v-186H220v680h520v-494H551ZM220-820v186-186 680-680Z"/></svg>)
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
