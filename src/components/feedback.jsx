@@ -57,9 +57,19 @@ const FeedbackForm = () => {
       <div className="max-w-xl mx-auto p-6 bg-white shadow rounded">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-blue-700 mb-2">
-            📣 We Want to Hear From You!
-          </h1>
+          <h1 className="flex items-center gap-2 text-3xl font-bold text-blue-700 mb-2">
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    height="44px" 
+    viewBox="0 -960 960 960" 
+    width="44px" 
+    fill="#000000"
+  >
+    <path d="M655-452v-60h145v60H655Zm33 292-119-88 34-47 119 88-34 47Zm-85-505-34-47 119-88 34 47-119 88ZM120-361v-240h160l200-200v640L280-361H120Zm300-288L307-541H180v120h127l113 109v-337Zm-94 168Z"/>
+  </svg>
+  We Want to Hear From You!
+</h1>
+
           <p className="text-gray-700 text-md">
             Got a suggestion? Found something helpful? Or just want to say hi?
             Your feedback helps us improve this platform for every student. Fill
@@ -67,8 +77,15 @@ const FeedbackForm = () => {
           </p>
         </div>
 
-        <h2 className="text-2xl font-bold text-center mb-4 text-blue-700">
-          📋 Submit Your Feedback
+        <h2 className="text-2xl flex items-center gap-2 font-bold text-center mb-4 text-blue-700">
+          <svg xmlns="http://www.w3.org/2000/svg" 
+           height="35px" 
+           viewBox="0 -960 960 960" 
+           width="35px" 
+           fill="#000000">
+           <path d="M479.98-367q14.02 0 23.52-9.48t9.5-23.5q0-14.02-9.48-23.52t-23.5-9.5q-14.02 0-23.52 9.48t-9.5 23.5q0 14.02 9.48 23.52t23.5 9.5ZM450-509h60v-251h-60v251ZM80-80v-740q0-24 18-42t42-18h680q24 0 42 18t18 42v520q0 24-18 42t-42 18H240L80-80Zm134-220h606v-520H140v600l74-80Zm-74 0v-520 520Z"/>
+          </svg>
+          Submit Your Feedback
         </h2>
 
         <div className="mb-4">

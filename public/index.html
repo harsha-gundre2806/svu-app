@@ -2,16 +2,19 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/png" href="%PUBLIC_URL%/fevi.jpg" />
+    <link rel="icon" type="image/png" href="fevi.jpg" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta name="description" content="SVU Student Website" />
     <title>SVU Student Website</title>
+
+    <!-- Inject React build CSS -->
+    <?!= HtmlService.createHtmlOutputFromFile("main_css").getContent(); ?>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+
+    <!-- Inject React build JS -->
+    <?!= HtmlService.createHtmlOutputFromFile("main_js").getContent(); ?>
   </body>
 </html>

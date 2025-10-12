@@ -83,7 +83,7 @@ const StudentUpload = () => {
       <div className="max-w-xl mx-auto p-6 bg-white shadow rounded">
         <div className="text-center max-w-2xl mx-auto mb-6">
           <h1 className="text-3xl font-bold text-blue-700 mb-2">
-            🎓 Share Your Knowledge with Others
+             Share Your Knowledge with Others
           </h1>
           <p className="text-gray-700 text-m">
             Upload your valuable study materials, class notes, PDFs, or helpful
@@ -94,8 +94,15 @@ const StudentUpload = () => {
           </p>
         </div>
 
-        <h2 className="text-xl font-bold mb-4 text-center">
-          📤 Student File Upload
+        <h2 className="text-xl flex items-center gap-2 font-bold mb-4 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" 
+          height="30px" 
+          viewBox="0 -960 960 960" 
+          width="30px" 
+          fill="#000000">
+            <path d="M450-313v-371L330-564l-43-43 193-193 193 193-43 43-120-120v371h-60ZM220-160q-24 0-42-18t-18-42v-143h60v143h520v-143h60v143q0 24-18 42t-42 18H220Z"/>
+          </svg> 
+          Student File Upload
         </h2>
 
         <div className="mb-3">
