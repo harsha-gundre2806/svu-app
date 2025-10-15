@@ -159,13 +159,11 @@ function App() {
   }
 />
 
-          
   <Route
   path="/gallery"
   element={
     <Suspense fallback={<div className="p-6 text-center">Loading gallery...</div>}>
       <div className="max-w-6xl mx-auto p-4">
-        {/* Gallery display only */}
         <ImageGallery files={uploads} />
       </div>
     </Suspense>
@@ -178,19 +176,18 @@ function App() {
     <Suspense fallback={<div className="p-6 text-center">Loading upload panel...</div>}>
       <div className="max-w-3xl mx-auto p-4">
         <h2 className="text-2xl font-bold mb-4 text-center">Image & Video Upload</h2>
-
-        {/* Upload panel */}
-        <ImageGalleryUpload refreshGallery={fetchUploads} />
-
+        <ImageGalleryUpload onUpload={fetchUploads} />
         <hr className="my-6 border-gray-300" />
-
-        {/* Gallery below the upload panel */}
         <h3 className="text-xl font-semibold mb-4 text-center">Uploaded Files</h3>
         <ImageGallery files={uploads} />
       </div>
     </Suspense>
   }
 />
+        
+  
+
+
 
 
 

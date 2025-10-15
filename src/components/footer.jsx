@@ -23,6 +23,8 @@ const Footer = ({ isAdmin }) => {
             <li><Link to="/about-svu" className="hover:underline" onClick={() => window.scrollTo(0, 0)}>About SVU</Link></li>
             <li><Link to="/recent" className="hover:underline" onClick={() => window.scrollTo(0, 0)}>Recent Files</Link></li>
             <li><Link to="/announcements" className="hover:underline" onClick={() => window.scrollTo(0, 0)}>Announcements</Link></li>
+            <li><Link to="/gallery" className="hover:underline" onClick={() => window.scrollTo(0, 0)}>Image Gallery</Link></li>
+        
           </ul>
         </div>
 

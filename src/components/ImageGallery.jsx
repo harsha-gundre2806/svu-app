@@ -1,222 +1,153 @@
-// File: src/ImageGallery.jsx
-import React, { useState, useEffect } from "react";
-import { apiCall } from "./apiService";
-
-/**
- * Helper to convert YouTube watch URL to an embed URL.
- * @param {string} url - The video URL.
- * @returns {string} - The embed URL or the original URL if not YouTube.
- */
-const getEmbedLink = (url) => {
-  const youtubeMatch = url.match(
-    /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=))([\w-]{11})/
-  );
-  if (youtubeMatch && youtubeMatch[1]) {
-    // Return a standard YouTube embed URL
-    return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
-  }
-  // Assume it's a direct video link or Google Drive link otherwise
-  return url;
-};
-
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X } from "lucide-react";
+import HeroSection from "./HeroSection";
 
 const ImageGallery = () => {
-  const [images, setImages] = useState([]);
-  const [videos, setVideos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [modalItem, setModalItem] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeItem, setActiveItem] = useState(null);
+  const [expandedItems, setExpandedItems] = useState({});
 
-  // Fetch data from Apps Script
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const data = await apiCall({}, "GET"); 
+  const items = [
+    {
+      id: 1,
+      type: "image",
+      src: "/img gal 1.jpeg",
+      text: "This is an image titled Gal1. It demonstrates how images are displayed within the gallery, showing a brief caption below the content. You can expand this text by clicking on View More, which allows you to see all details about this media content in the gallery component. It's a beautiful image showcasing design precision and smooth interaction.",
+    },
+    {
+      id: 2,
+      type: "video",
+      src: "/CYNOSURE.mp4",
+      text: "This looping and muted video (CYNOSURE) is part of the gallery. It can be previewed in a small view and expanded to occupy 75% of the screen. The video demonstrates smooth animations, transitions, and muted playback for a clean gallery experience.",
+    },
+  ];
 
-      setImages(Array.isArray(data.images) ? data.images : []);
-      setVideos(Array.isArray(data.videos) ? data.videos : []);
-    } catch (err) {
-      console.error("Error fetching gallery:", err);
-    } finally {
-      setLoading(false);
-    }
+  const handleOpen = (item) => {
+    setActiveItem(item);
+    setIsOpen(true);
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const openModal = (item) => {
-    setModalItem(item);
-    setShowModal(true);
+  const handleClose = () => {
+    setIsOpen(false);
+    setActiveItem(null);
   };
 
-  const closeModal = () => {
-    setModalItem(null);
-    setShowModal(false);
+  const toggleExpand = (id) => {
+    setExpandedItems((prev) => ({ ...prev, [id]: !prev[id] }));
   };
-
-  // Divide content for the initial display and the 'View More' modal
-  const initialImages = images.slice(0, 4);
-  const moreImages = images.slice(4);
-  const initialVideos = videos.slice(0, 4);
-  const moreVideos = videos.slice(4);
-
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen font-['Inter'] bg-gray-50">
-        <div className="flex space-x-4 mb-4">
-          <div className="w-16 h-16 bg-gray-300 rounded-lg animate-spin-slow"></div>
-          <div className="w-16 h-16 bg-gray-300 rounded-lg animate-spin-slow delay-150"></div>
-          <div className="w-16 h-16 bg-gray-300 rounded-lg animate-spin-slow delay-300"></div>
-        </div>
-        <p className="text-gray-700 text-lg">Preparing your gallery...</p>
-      </div>
-    );
-  }
-
-  const cardClasses =
-    "bg-white rounded-xl shadow-sm overflow-hidden transform transition hover:-translate-y-1 hover:shadow-md cursor-pointer";
-    
-  // --- Individual Card Component (Helper for reuse) ---
-  const GalleryCard = ({ f, isVideo }) => {
-    return (
-      <div key={f.id || f.name} className={cardClasses}>
-        <div
-          onClick={() => {
-            if (isVideo) {
-                openModal(f);
-            }
-          }}
-        >
-          <a
-            href={!isVideo ? f.link || "#" : undefined}
-            target={!isVideo ? "_blank" : undefined}
-            rel={!isVideo ? "noopener noreferrer" : undefined}
-          >
-            <img
-              src={f.cover}
-              alt={f.name}
-              className="w-full h-40 object-cover rounded-t-xl"
-            />
-          </a>
-        </div>
-        <div className="p-3">
-          <h4 className="truncate font-medium text-gray-800">
-            {f.description || f.name}
-          </h4>
-        </div>
-      </div>
-    );
-  };
-  // ----------------------------------------------------
-
 
   return (
-    <div className="p-6 max-w-7xl mx-auto font-['Inter']">
-      <h1 className="text-4xl font-bold text-center mb-10 bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text">
-        University Events Gallery
-      </h1>
+    <div className="min-h-screen rounded-2xl bg-gray-200 text-white">
+      {/* Hero Section */}
+      <HeroSection />
+      
+      {/* Gallery Grid */}
+      <div className="p-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        {items.map((item) => {
+          const isExpanded = expandedItems[item.id];
+          const shouldTruncate = item.text.length > 150;
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        {/* === IMAGES SECTION === */}
-        <div>
-          <h2 className="text-2xl font-semibold mb-4 text-blue-600">Images</h2>
-          {initialImages.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4">
-              {initialImages.map((f) => <GalleryCard key={f.id} f={f} isVideo={false} />)}
-            </div>
-          ) : (
-            <p className="text-gray-500 italic">No images available.</p>
-          )}
-          {moreImages.length > 0 && (
-            <button
-              onClick={() => openModal({type: 'image', content: moreImages})}
-              className="mt-4 px-5 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition"
+          return (
+            <motion.div
+              key={item.id}
+              whileHover={{ y: -8 }} // move slightly up on hover
+              className="rounded-3xl overflow-hidden cursor-pointer bg-gray-900 border border-gray-800 flex flex-col transition-transform duration-300"
+              onClick={() => handleOpen(item)}
             >
-              View More
-            </button>
-          )}
-        </div>
+              {item.type === "image" ? (
+                <img
+                  src={item.src}
+                  alt={item.text}
+                  className="w-full h-64 object-cover rounded-t-3xl"
+                />
+              ) : (
+                <video
+                  src={item.src}
+                  className="w-full h-64 object-cover rounded-t-3xl"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                />
+              )}
 
-        {/* === VIDEOS SECTION === */}
-        <div>
-          <h2 className="text-2xl font-semibold mb-4 text-purple-600">Videos</h2>
-          {initialVideos.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4">
-              {initialVideos.map((f) => <GalleryCard key={f.id} f={f} isVideo={true} />)}
-            </div>
-          ) : (
-            <p className="text-gray-500 italic">No videos available.</p>
-          )}
-          {moreVideos.length > 0 && (
-            <button
-              onClick={() => openModal({type: 'video', content: moreVideos})}
-              className="mt-4 px-5 py-2 bg-purple-600 text-white rounded-md font-medium hover:bg-purple-700 transition"
-            >
-              View More
-            </button>
-          )}
-        </div>
+              {/* Text with View More */}
+              <div
+                className="p-4 text-gray-300"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <p
+                  className={`transition-all duration-300 ${
+                    isExpanded ? "" : "line-clamp-4"
+                  }`}
+                >
+                  {item.text}
+                </p>
+
+                {shouldTruncate && (
+                  <button
+                    className="text-blue-400 mt-2 text-sm font-medium hover:underline"
+                    onClick={() => toggleExpand(item.id)}
+                  >
+                    {isExpanded ? "View Less" : "View More"}
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
 
-      {/* === MODAL === */}
-      {showModal && modalItem && (
-        <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fadeIn"
-          onClick={closeModal}
-        >
-          <div
-            className="bg-white rounded-xl shadow-md w-[90%] md:w-[70%] max-h-[80vh] overflow-y-auto p-6 transform transition-all"
-            onClick={(e) => e.stopPropagation()}
+      {/* Modal */}
+      <AnimatePresence>
+        {isOpen && activeItem && (
+          <motion.div
+            className="fixed inset-0 bg-black/80 flex justify-center items-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={handleClose}
           >
-            <h3 className="text-2xl font-bold mb-6 text-center">
-              {modalItem.type === "image" ? "More Images" : "Video Player"}
-            </h3>
-            
-            {/* Conditional Content: Individual Video vs. More Items Grid */}
-            {modalItem.link ? ( // Single video player
-                <div className="aspect-video mb-6">
-                    <iframe
-                      className="w-full h-full rounded-lg"
-                      src={getEmbedLink(modalItem.link)}
-                      title={modalItem.name}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    ></iframe>
-                    <p className="mt-3 text-center text-lg font-semibold">{modalItem.description || modalItem.name}</p>
-                </div>
-            ) : ( // Grid for 'View More'
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                    {(modalItem.content || []).map((f) => (
-                        <div key={f.id} className={cardClasses} onClick={() => openModal(f)}> 
-                            <img
-                              src={f.cover}
-                              alt={f.name}
-                              className="w-full h-48 object-cover rounded-t-xl"
-                            />
-                            <div className="p-3">
-                                <h4 className="truncate font-medium text-gray-800">
-                                  {f.description || f.name}
-                                </h4>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
-            
-            <div className="text-center mt-6">
+            <motion.div
+              className="relative bg-gray-900 rounded-3xl p-6 w-[75%] max-h-[90%] overflow-y-auto border border-gray-800 shadow"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={(e) => e.stopPropagation()}
+            >
               <button
-                onClick={closeModal}
-                className="px-5 py-2 bg-gray-500 text-white rounded-md font-medium hover:bg-gray-600 transition"
+                onClick={handleClose}
+                className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
               >
-                Close
+                <X size={26} />
               </button>
-            </div>
-          </div>
-        </div>
-      )}
+
+              {activeItem.type === "image" ? (
+                <img
+                  src={activeItem.src}
+                  alt="Full View"
+                  className="w-full rounded-3xl mb-4"
+                />
+              ) : (
+                <video
+                  src={activeItem.src}
+                  className="w-full rounded-3xl mb-4"
+                  autoPlay
+                  loop
+                  muted
+                  controls
+                />
+              )}
+
+              <p className="text-gray-300 text-base leading-relaxed">
+                {activeItem.text}
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
